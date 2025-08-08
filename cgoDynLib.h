@@ -75,7 +75,7 @@ const char* DATA_RELEASER_NAME = "releasedata";
 const char* EDB_QUERIER_NAME = "edb";
 
 //宏观指标id详情查询(同步请求)
-const char* DEB_DTL_QUERIER_NAME = "edbquery";
+const char* EDB_DTL_QUERIER_NAME = "edbquery";
 
 //资讯数据查询(同步请求) codes：东财代码或板块代码（不可混合） content：查询内容
 const char* CFN_QUERIER_NAME = "cfn";
@@ -88,9 +88,12 @@ typedef const char* (*err_getter)(EQErr, EQLang);
 typedef EQErr (*starter)(EQLOGININFO*, const char*, logcallback);
 typedef EQErr (*stopper)();
 typedef EQErr (*data_releaser)(void*);
+typedef EQErr (*query_pchar_pdata)(const char*, EQDATA**);
+typedef EQErr (*query_cfn_pdata)(const char*, const char*, eCfnMode, const char*, EQDATA**);
 typedef EQErr (*query_pchar2_pdata)(const char*, const char*, EQDATA**);
 typedef EQErr (*query_pchar3_pdata)(const char*, const char*, const char*, EQDATA**);
 typedef EQErr (*query_pchar5_pdata)(const char*, const char*, const char*, const char*, const char*, EQDATA**);
+typedef EQErr (*query_pchar3_pctrdata)(const char*, const char*, const char*, EQCTRDATA**);
 
 int CallCbSetter(callback_setter fn, datacallback cb)
 {
@@ -110,6 +113,21 @@ int CallStarter(starter fn, EQLOGININFO* login, const char* options, logcallback
 int CallStopper(stopper fn) { return fn(); }
 
 int CallDataReleaser(data_releaser fn, void* data) { return fn(data); }
+
+int CallPCharPData(
+	query_pchar_pdata fn, const char* p1, EQDATA** data
+)
+{
+	return fn(p1, data);
+}
+
+int CallCfnQuerier(
+	query_cfn_pdata fn, const char* codes, const char* content,
+	eCfnMode mode, const char* options, EQDATA** data
+)
+{
+	return fn(codes, content, mode, options, data);
+}
 
 int CallPChar2PData(
 	query_pchar2_pdata fn, const char* p1, const char* p2, EQDATA** data
@@ -132,6 +150,14 @@ int CallPChar5PData(
 )
 {
 	return fn(p1, p2, p3, p4, p5, data);
+}
+
+int CallPChar3PCtrData(
+	query_pchar3_pctrdata fn, const char* p1, const char* p2,
+	const char* p3, EQCTRDATA** data
+)
+{
+	return fn(p1, p2, p3, data);
 }
 
 #ifdef __cplusplus

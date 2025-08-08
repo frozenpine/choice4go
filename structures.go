@@ -20,8 +20,9 @@ type Value interface {
 }
 
 var (
-	dataPool  = sync.Pool{New: func() any { return &EQData{} }}
-	valuePool = sync.Pool{New: func() any { return &EQValue{} }}
+	dataPool    = sync.Pool{New: func() any { return &EQData{} }}
+	ctrDataPool = sync.Pool{New: func() any { return &EQCtrData{} }}
+	valuePool   = sync.Pool{New: func() any { return &EQValue{} }}
 )
 
 type EQValue struct {
@@ -133,10 +134,10 @@ func (v *EQValue) GetValue() any {
 }
 
 type Indicator struct {
-	Code      string
-	Date      time.Time
-	sortedKey []string
-	value     map[string]*EQValue
+	Code       string
+	Date       time.Time
+	indicators []string
+	value      []*EQValue
 }
 
 func (v Indicator) String() string {
@@ -148,12 +149,12 @@ func (v Indicator) String() string {
 	buff.WriteString(" Date:")
 	buff.WriteString(v.Date.Format("2006-01-02"))
 	buff.WriteString(" Indicators:{")
-	for idx, name := range v.sortedKey {
+	for idx, name := range v.indicators {
 		if idx > 0 {
 			buff.WriteByte(' ')
 		}
 		buff.WriteString(
-			fmt.Sprintf("%s:%+v", name, v.value[name].GetValue()),
+			fmt.Sprintf("%s:%+v", name, v.value[idx].GetValue()),
 		)
 	}
 	buff.WriteString("}}")
@@ -218,15 +219,15 @@ func (data *EQData) Iter() func(yield func(int, Indicator) bool) {
 
 			for idxCode, code := range data.codes {
 				value := Indicator{
-					Code:      code,
-					Date:      date,
-					sortedKey: data.indicators,
-					value:     make(map[string]*EQValue),
+					Code:       code,
+					Date:       date,
+					indicators: data.indicators,
+					value:      make([]*EQValue, indicatorSize),
 				}
 
-				for idxIndicator, indicator := range data.indicators {
+				for idxIndicator := range data.indicators {
 					idx := codeSize*indicatorSize*idxDate + indicatorSize*idxCode + idxIndicator
-					value.value[indicator] = data.values[idx]
+					value.value[idxIndicator] = data.values[idx]
 				}
 
 				if !yield(rowIdx, value) {
@@ -234,6 +235,49 @@ func (data *EQData) Iter() func(yield func(int, Indicator) bool) {
 				}
 
 				rowIdx++
+			}
+		}
+	}
+}
+
+type Report struct {
+	indicators []string
+	value      []*EQValue
+}
+
+func (rpt Report) String() string {
+	buff := bytebufferpool.Get()
+	defer bytebufferpool.Put(buff)
+
+	buff.WriteString("Report{")
+	// for _, name := range
+	buff.WriteString("}")
+
+	return buff.String()
+}
+
+type EQCtrData struct {
+	row        int
+	column     int
+	indicators []string
+	values     []*EQValue
+}
+
+func (ctr *EQCtrData) Iter() func(yield func(int, Report) bool) {
+	return func(yield func(int, Report) bool) {
+		for rowIdx := range ctr.row {
+			value := Report{
+				indicators: ctr.indicators,
+				value:      make([]*EQValue, ctr.column),
+			}
+
+			for colIdx := range ctr.column {
+				idx := ctr.column*rowIdx + colIdx
+				value.value[colIdx] = ctr.values[idx]
+			}
+
+			if !yield(rowIdx, value) {
+				return
 			}
 		}
 	}
