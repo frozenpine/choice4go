@@ -35,5 +35,7 @@ func TestChoiceCSD(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	t.Logf("%+v", results)
+	for _, v := range results.Iter() {
+		t.Logf("%+v", v)
+	}
 }

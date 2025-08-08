@@ -353,14 +353,14 @@ func convertEQData(data *C.EQDATA) (*EQData, error) {
 	}
 
 	result := EQData{
-		Codes:      convertStringArr(data.codeArray),
-		Indicators: convertStringArr(data.indicatorArray),
-		Date:       convertStringArr(data.dateArray),
-		Values:     make([]EQValue, data.valueArray.nSize),
+		codes:      convertStringArr(data.codeArray),
+		indicators: convertStringArr(data.indicatorArray),
+		dateList:   convertStringArr(data.dateArray),
+		values:     make([]EQValue, data.valueArray.nSize),
 	}
 
 	values := *(*[]C.EQVARIENT)(unsafe.Pointer(&reflect.SliceHeader{
-		Data: uintptr(unsafe.Pointer(&data.valueArray.pEQVarient)),
+		Data: uintptr(unsafe.Pointer(data.valueArray.pEQVarient)),
 		Len:  int(data.valueArray.nSize),
 		Cap:  int(data.valueArray.nSize),
 	}))
@@ -368,35 +368,35 @@ func convertEQData(data *C.EQDATA) (*EQData, error) {
 	for idx, v := range values {
 		switch v.vtype {
 		case C.eVT_null:
-			result.Values[idx].ValueType = ValueNull
+			result.values[idx].valueType = ValueNull
 		case C.eVT_char:
-			result.Values[idx].ValueType = ValueChar
+			result.values[idx].valueType = ValueChar
 		case C.eVT_byte:
-			result.Values[idx].ValueType = ValueByte
+			result.values[idx].valueType = ValueByte
 		case C.eVT_bool:
-			result.Values[idx].ValueType = ValueBool
+			result.values[idx].valueType = ValueBool
 		case C.eVT_short:
-			result.Values[idx].ValueType = ValueShort
+			result.values[idx].valueType = ValueShort
 		case C.eVT_ushort:
-			result.Values[idx].ValueType = ValueUShort
+			result.values[idx].valueType = ValueUShort
 		case C.eVT_int:
-			result.Values[idx].ValueType = ValueInt
+			result.values[idx].valueType = ValueInt
 		case C.eVT_uInt:
-			result.Values[idx].ValueType = ValueUInt
+			result.values[idx].valueType = ValueUInt
 		case C.eVT_int64:
-			result.Values[idx].ValueType = ValueInt64
+			result.values[idx].valueType = ValueInt64
 		case C.eVT_uInt64:
-			result.Values[idx].ValueType = ValueUInt64
+			result.values[idx].valueType = ValueUInt64
 		case C.eVT_float:
-			result.Values[idx].ValueType = ValueSingle
+			result.values[idx].valueType = ValueSingle
 		case C.eVT_double:
-			result.Values[idx].ValueType = ValueDouble
+			result.values[idx].valueType = ValueDouble
 		case C.eVT_byteArray:
-			result.Values[idx].ValueType = ValueBytes
+			result.values[idx].valueType = ValueBytes
 		case C.eVT_asciiString:
-			result.Values[idx].ValueType = ValueString
+			result.values[idx].valueType = ValueString
 		case C.eVT_unicodeString:
-			result.Values[idx].ValueType = ValueString
+			result.values[idx].valueType = ValueString
 		default:
 			slog.Warn(
 				"choice unsupported data value",
@@ -404,11 +404,17 @@ func convertEQData(data *C.EQDATA) (*EQData, error) {
 			)
 		}
 
-		C.memcpy(
-			unsafe.Pointer(&result.Values[idx].valueBuffer[0]),
-			unsafe.Pointer(&v.unionValues[0]),
-			8,
-		)
+		if result.values[idx].valueType == ValueString {
+			result.values[idx].valueString = C.GoStringN(
+				v.eqchar.pChar, C.int(v.eqchar.nSize),
+			)
+		} else {
+			C.memcpy(
+				unsafe.Pointer(&result.values[idx].valueBuffer[0]),
+				unsafe.Pointer(&v.unionValues[0]),
+				8,
+			)
+		}
 	}
 
 	return &result, nil
