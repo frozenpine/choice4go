@@ -339,6 +339,46 @@ func convertStringArr(arr C.EQCHARARRAY) []string {
 	return results
 }
 
+func newEQData(v *C.EQDATA) (*EQData, error) {
+	data, ok := dataPool.Get().(*EQData)
+	if !ok {
+		return nil, fmt.Errorf(
+			"%w: fail to get EQData", ErrGetData,
+		)
+	}
+
+	data.codes = convertStringArr(v.codeArray)
+	data.indicators = convertStringArr(v.indicatorArray)
+	data.dateList = convertStringArr(v.dateArray)
+	data.values = make([]*EQValue, v.valueArray.nSize)
+
+	for idx := range data.values {
+		value, ok := valuePool.Get().(*EQValue)
+
+		if !ok {
+			return nil, fmt.Errorf(
+				"%w: fail to get EQValue", ErrGetData,
+			)
+		}
+
+		value.valueType = ValueNull
+		clear(value.valueBuffer[:])
+		value.valueString = ""
+
+		data.values[idx] = value
+	}
+
+	runtime.SetFinalizer(data, func(data *EQData) {
+		for _, value := range data.values {
+			valuePool.Put(value)
+		}
+
+		dataPool.Put(data)
+	})
+
+	return data, nil
+}
+
 func convertEQData(data *C.EQDATA) (*EQData, error) {
 	if data.valueArray.nSize == 0 {
 		return nil, ErrDataEmpty
@@ -352,11 +392,9 @@ func convertEQData(data *C.EQDATA) (*EQData, error) {
 		)
 	}
 
-	result := EQData{
-		codes:      convertStringArr(data.codeArray),
-		indicators: convertStringArr(data.indicatorArray),
-		dateList:   convertStringArr(data.dateArray),
-		values:     make([]EQValue, data.valueArray.nSize),
+	result, err := newEQData(data)
+	if err != nil {
+		return nil, err
 	}
 
 	values := *(*[]C.EQVARIENT)(unsafe.Pointer(&reflect.SliceHeader{
@@ -417,7 +455,7 @@ func convertEQData(data *C.EQDATA) (*EQData, error) {
 		}
 	}
 
-	return &result, nil
+	return result, nil
 }
 
 func (ins *Choice) Csd(

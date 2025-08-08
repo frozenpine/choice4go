@@ -7,6 +7,7 @@ import (
 	"math"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/valyala/bytebufferpool"
@@ -17,6 +18,11 @@ type Value interface {
 	~uint8 | ~uint | ~int | ~uint32 | ~int32 |
 		~uint64 | ~int64 | ~float32 | ~float64 | ~[]uint8
 }
+
+var (
+	dataPool  = sync.Pool{New: func() any { return &EQData{} }}
+	valuePool = sync.Pool{New: func() any { return &EQValue{} }}
+)
 
 type EQValue struct {
 	valueType   eqValueType
@@ -159,7 +165,7 @@ type EQData struct {
 	codes      []string
 	indicators []string
 	dateList   []string
-	values     []EQValue
+	values     []*EQValue
 }
 
 func (data *EQData) Iter() func(yield func(int, Indicator) bool) {
@@ -220,7 +226,7 @@ func (data *EQData) Iter() func(yield func(int, Indicator) bool) {
 
 				for idxIndicator, indicator := range data.indicators {
 					idx := codeSize*indicatorSize*idxDate + indicatorSize*idxCode + idxIndicator
-					value.value[indicator] = &data.values[idx]
+					value.value[indicator] = data.values[idx]
 				}
 
 				if !yield(rowIdx, value) {

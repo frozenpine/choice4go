@@ -10,6 +10,7 @@ var (
 	ErrMainCbFailed      = errors.New("set main callback failed")
 	ErrDataEmpty         = errors.New("data is empty")
 	ErrDataLenMissMatch  = errors.New("data len mismatch")
+	ErrGetData           = errors.New("make data structure failed")
 	ErrEQCall            = errors.New("choice func call failed")
 	ErrInvalidCodes      = errors.New("invalid codes")
 	ErrTooManyIndicators = errors.New("too many indicators")
