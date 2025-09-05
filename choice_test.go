@@ -1,0 +1,329 @@
+package choice4go
+
+import (
+	"context"
+	"log/slog"
+	"testing"
+	"time"
+)
+
+var (
+	libDir  = "./libs"
+	libName = "EMQuantAPI"
+	cfgDir  = "./cfg"
+	user    = ""
+	pass    = ""
+)
+
+func init() {
+	slog.SetLogLoggerLevel(slog.LevelDebug)
+}
+
+func TestChoiceCsd(t *testing.T) {
+	choice, err := NewChoice(
+		libDir, libName, cfgDir,
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if err = choice.Start(
+		context.TODO(), user, pass,
+		NewStartOptions().
+			TestLatency().
+			ForceLogin().
+			LogLevel(slog.LevelDebug),
+	); err != nil {
+		t.Fatal(err)
+	}
+	defer choice.Stop()
+
+	if results, err := choice.Csd(
+		[]string{"AG0.SHF", "600519.SH"},
+		[]string{
+			"OPEN", "CLOSE", "HIGH", "LOW", "VOLUME", "AMOUNT", "PRECLOSE",
+			"CHANGE", "MAINFORCE",
+		},
+		NewDateArg(2024, 1, 1), NewDateArg(2024, 12, 31),
+		nil,
+	); err != nil {
+		t.Fatal(err)
+	} else {
+		for _, v := range results.Iter() {
+			t.Logf("%+v", v)
+		}
+	}
+
+	// if results, err := choice.TradeDates(
+	// 	NewDateArg(2024, 1, 1), NewDateArg(2024, 12, 31),
+	// 	nil,
+	// ); err != nil {
+	// 	t.Fatal(err)
+	// } else {
+	// 	for _, v := range results.Iter() {
+	// 		t.Logf("%+v", v)
+	// 	}
+	// }
+
+	// if results, err := choice.Csd(
+	// 	[]string{"000002.SZ", "300059.SZ"},
+	// 	[]string{"OPEN", "HIGH", "LOW", "CLOSE"},
+	// 	NewDateArg(2016, 1, 10), NewDateArg(2016, 4, 13),
+	// 	NewCsdOptions().
+	// 		Period(Daily).
+	// 		Adjust(NoAdjusted).
+	// 		Currency(CurrCNY).
+	// 		BondType(BondDirty),
+	// ); err != nil {
+	// 	t.Fatal(err)
+	// } else {
+	// 	for _, v := range results.Iter() {
+	// 		t.Logf("%+v", v)
+	// 	}
+	// }
+}
+
+func TestChoiceCsdPredict(t *testing.T) {
+	choice, err := NewChoice(
+		libDir, libName, cfgDir,
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if err = choice.Start(
+		context.TODO(), user, pass,
+		NewStartOptions().
+			TestLatency().
+			ForceLogin().
+			LogLevel(slog.LevelDebug),
+	); err != nil {
+		t.Fatal(err)
+	}
+	defer choice.Stop()
+
+	symbols := []string{
+		"002961.SZ", "600519.SH",
+	}
+
+	if results, err := choice.Csd(
+		symbols,
+		[]string{
+			"RATINGAVG", "RATINGAVGCHN", "RATINGAVGENG", "RATINGINSTNUM",
+			"RATINGMAINTAIN", "RATINGUPGRADE", "RATINGDOWNGRADE",
+			"RATINGNUMOFBUY", "RATINGNUMOFOUTPERFORM", "RATINGNUMOFHOLD",
+			"RATINGNUMOFUNDERPERFORM", "RATINGNUMOFSELL", "UPGRADE",
+		},
+		NewDateArg(2024, 1, 1), NewDateArg(2025, 8, 25),
+		nil,
+	); err != nil {
+		t.Fatal(err)
+	} else {
+		for _, v := range results.Iter() {
+			t.Logf("%+v", v)
+		}
+	}
+}
+
+func TestChoiceCfc(t *testing.T) {
+	choice, err := NewChoice(
+		libDir, libName, cfgDir,
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if err = choice.Start(
+		context.TODO(), user, pass,
+		NewStartOptions().
+			// TestLatency().
+			ForceLogin().
+			LogLevel(slog.LevelDebug),
+	); err != nil {
+		t.Fatal(err)
+	}
+	defer choice.Stop()
+
+	if results, err := choice.Cfc(
+		[]string{"002961.SZ"},
+		[]string{
+			"EPSBASIC", "EPSDILUTED", "EPSDILUTEDEND", "EPSDILUTEDNEW",
+			"EPSEXBASIC", "EPSEXDILUTED", "EPSEXDILUTEDEND", "EPSEXDILUTEDNEW",
+			"EPSTTM", "EPSNEW", "BPS", "BPSDILUTEDNEW", "BPSNEW", "CFOPS",
+			"CFOPSTTM", "CFOPSDILUTEDNEW", "GRPS", "ORPS", "ORPSTTM",
+			"CAPITALRESERVEPS", "CAPITALRESERVEPSNEW", "SURPLUSRESERVEPS",
+			"UNDISTRIBUTEDPS", "UNDISTRIBUTEDPSN", "RETAINEDPS", "CFPS",
+			"CFPSTTM", "CFPSDILUTEDNEW", "EBITPS", "FCFFPS", "FCFEPS", "EBITDAPS",
+		},
+		FuncCSS,
+	); err != nil {
+		t.Fatal(err)
+	} else {
+		for _, v := range results.Iter() {
+			t.Logf("%+v", v)
+		}
+	}
+}
+
+func TestChoiceCss(t *testing.T) {
+	choice, err := NewChoice(
+		libDir, libName, cfgDir,
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if err = choice.Start(
+		context.TODO(), user, pass,
+		NewStartOptions().
+			// TestLatency().
+			ForceLogin().
+			LogLevel(slog.LevelDebug),
+	); err != nil {
+		t.Fatal(err)
+	}
+	defer choice.Stop()
+
+	rptDate := time.Date(2025, 6, 30, 0, 0, 0, 0, time.Local)
+	tradeDate := time.Date(2025, 8, 25, 0, 0, 0, 0, time.Local)
+	endDate := time.Date(2025, 8, 25, 0, 0, 0, 0, time.Local)
+
+	symbols := []string{
+		"002961.SZ", "600519.SH",
+	}
+
+	if results, err := choice.Css(
+		symbols,
+		[]string{
+			"EPSBASIC", "EPSDILUTED", "EPSDILUTEDEND", "EPSDILUTEDNEW",
+			"EPSEXBASIC", "EPSEXDILUTED", "EPSEXDILUTEDEND", "EPSEXDILUTEDNEW",
+			"EPSTTM", "EPSNEW", "BPS", "BPSDILUTEDNEW", "BPSNEW", "CFOPS",
+			"CFOPSTTM", "CFOPSDILUTEDNEW", "GRPS", "ORPS", "ORPSTTM",
+			"CAPITALRESERVEPS", "CAPITALRESERVEPSNEW", "SURPLUSRESERVEPS",
+			"UNDISTRIBUTEDPS", "UNDISTRIBUTEDPSN", "RETAINEDPS", "CFPS",
+			"CFPSTTM", "CFPSDILUTEDNEW", "EBITPS", "FCFFPS", "FCFEPS", "EBITDAPS",
+		},
+		NewCssOptions().
+			ReportDate(rptDate).
+			EndDate(endDate).
+			TradeDate(tradeDate),
+	); err != nil {
+		t.Fatal(err)
+	} else {
+		for _, v := range results.Iter() {
+			t.Logf("%+v", v)
+		}
+	}
+}
+
+func TestChoiceCtr(t *testing.T) {
+	choice, err := NewChoice(
+		libDir, libName, cfgDir,
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if err = choice.Start(
+		context.TODO(), user, pass,
+		NewStartOptions().
+			// TestLatency().
+			ForceLogin().
+			LogLevel(slog.LevelDebug),
+	); err != nil {
+		t.Fatal(err)
+	}
+	defer choice.Stop()
+
+	// BalanceStatementSHSZ 资产负债表
+	// IncomeStatementSHSZ 利润表
+	// CashFlowStatementSHSZ 现金流表
+	// InstPredictionInfo 盈利预测
+	// Options:ReportType 1 合并报表
+	// Options:ReportType 2 合并报表调整
+	// Options:ReportType 3 母公司报表
+	// Options:ReportType 3 母公司报表调整
+	// if result, err := choice.Ctr(
+	// 	StrArg(RptNameBalance.Name()),
+	// 	[]string{
+	// 		"MONETARYFUND", "SETTLEMENTPROVISION", "LENDFUND",
+	// 		"TRADE_FINASSET_NOTFVTPL", "MARGINOUTFUND", "DERIVEFASSET",
+	// 		"ACCOUNTBILLREC", "BILLREC", "ACCOUNTREC", "FINANCE_RECE",
+	// 		"ADVANCEPAY", "PREMIUMREC", "RIREC", "RICONTACTRESERVEREC",
+	// 		"TOTAL_OTHER_RECE", "INTERESTREC", "DIVIDENDREC", "OTHERREC",
+	// 		"EXPORTREBATEREC", "SUBSIDYREC", "INTERNALREC", "BUYSELLBACKFASSET",
+	// 		"AMORCOSTFASSET", "FVALUECOMPFASSET", "INVENTORY", "CONTRACTASSET",
+	// 		"CLHELDSALEASS", "NONLASSETONEYEAR", "DLYWZC", "OTHERLASSET",
+	// 		"LASSETOTHER", "LASSETBALANCE", "SUMLASSET", "LOANADVANCES",
+	// 		"CREDINV", "AMORCOSTFASSETFLD", "OTHCREDINV", "FVALUECOMPFASSETFLD",
+	// 		"SALEABLEFASSET", "HELDMATURITYINV", "LTREC", "LTEQUITYINV",
+	// 		"OTHEREQUITYINV", "OTHERNONFASSET", "ESTATEINVEST", "FIXEDASSET",
+	// 		"CONSTRUCTIONPROGRESS", "CONSTRUCTIONMATERIAL",
+	// 		"LIQUIDATEFIXEDASSET", "PRODUCTBIOLOGYASSET", "OILGASASSET",
+	// 		"USERIGHT_ASSET", "INTANGIBLEASSET", "DEVELOPEXP", "GOODWILL",
+	// 		"LTDEFERASSET", "DEFERINCOMETAXASSET", "OTHERNONLASSET",
+	// 		"NONLASSETOTHER", "NONLASSETBALANCE", "SUMNONLASSET",
+	// 		"ASSETOTHER", "ASSETBALANCE", "SUMASSET",
+	// 		"STR_COMBINETYPE",
+	// 	},
+	// 	NewCtrOptions().
+	// 		ReportDate(time.Date(2025, 1, 31, 0, 0, 0, 0, time.Local)).
+	// 		// Range(
+	// 		// 	time.Date(2024, 1, 1, 0, 0, 0, 0, time.Local),
+	// 		// 	time.Date(2025, 12, 31, 0, 0, 0, 0, time.Local),
+	// 		// ).
+	// 		Code("601628.SH"),
+	// ); err != nil {
+	// 	t.Fatal(err)
+	// } else {
+	// 	for _, v := range result.Iter() {
+	// 		t.Logf("%+v", v)
+	// 	}
+	// }
+
+	if result, err := choice.Ctr(
+		StrArg(RptNameCashFlow.Name()),
+		[]string{
+			"INTANDCOMMREC", "OTHEROPERATEREC", "OPERATEFLOWINOTHER",
+			"OPERATEFLOWINBALANCE", "SUMOPERATEFLOWIN", "INTANDCOMMPAY",
+			"EMPLOYEEPAY", "TAXPAY", "OTHEROPERATEPAY", "OPERATEFLOWOUTOTHER",
+			"OPERATEFLOWOUTBALANCE", "SUMOPERATEFLOWOUT", "OPERATEFLOWOTHER",
+			"OPERATEFLOWBALANCE", "NETOPERATECASHFLOW", "DISPOSALINVREC",
+			"INVINCOMEREC", "DISPFILASSETREC", "DISPSUBSIDIARYREC",
+			"OTHERINVREC", "INVFLOWINOTHER", "INVFLOWINBALANCE", "SUMINVFLOWIN",
+			"BUYFILASSETPAY", "INVPAY", "OTHERINVPAY", "INVFLOWOUTOTHER",
+			"INVFLOWOUTBALANCE", "SUMINVFLOWOUT", "INVFLOWOTHER",
+			"NETINVCASHFLOW", "ACCEPTINVREC", "ISSUEBONDREC", "OTHERFINAREC",
+			"FINAFLOWINOTHER", "FINAFLOWINBALANCE", "SUMFINAFLOWIN",
+			"REPAYDEBTPAY", "DIVIPROFITORINTPAY", "OTHERFINAPAY",
+			"FINAFLOWOUTOTHER", "FINAFLOWOUTBALANCE", "SUMFINAFLOWOUT",
+			"FINAFLOWOTHER", "FINAFLOWBALANCE", "NETFINACASHFLOW",
+			"EFFECTEXCHANGERATE", "NICASHEQUIOTHER", "NICASHEQUIBALANCE",
+			"NICASHEQUI", "CASHEQUIBEGINNING", "CASHEQUIENDINGOTHER",
+			"CASHEQUIENDINGBALANCE", "CASHEQUIENDING", "NETPROFIT",
+			"ASSETDEVALUE", "FIXANDESTATEDEPR", "INTANGIBLEASSETAMOR",
+			"LTDEFEREXPAMOR", "DISPFILASSETLOSS", "FVALUELOSS", "INVLOSS",
+			"DEFERTAX", "DEFERTAXASSETREDUCE", "DEFERTAXLIABADD",
+			"OPERATERECREDUCE", "OPERATEPAYADD", "OTHER", "DEC_JYHDCSDXJLLJEQT",
+			"DEC_JYHDCSDXJLLJEPH", "DEC_JYHDCSDXJLLJE", "DEBTTOCAPITAL",
+			"CBONEYEAR", "FINALEASEFIXEDASSET", "NOREFERCASHOTHER",
+			"DEC_XJDQMYE", "DEC_XJDQCYE", "DEC_XJJZJECETS",
+			"DEC_XJJZJECEHJ",
+			"REPORTSOURCETYPE", "STR_COMBINETYPE",
+			"OPINIONTYPE", "FIRSTNOTICEDATE",
+		},
+		NewCtrOptions().
+			ReportDate(time.Date(2024, 12, 31, 0, 0, 0, 0, time.Local)).
+			// Range(
+			// 	time.Date(2024, 1, 1, 0, 0, 0, 0, time.Local),
+			// 	time.Date(2025, 12, 31, 0, 0, 0, 0, time.Local),
+			// ).
+			Code("600519.SH"),
+	); err != nil {
+		t.Fatal(err)
+	} else {
+		for _, v := range result.Iter() {
+			t.Logf("%+v", v)
+		}
+	}
+}
