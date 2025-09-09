@@ -11,8 +11,8 @@ var (
 	libDir  = "./libs"
 	libName = "EMQuantAPI"
 	cfgDir  = "./cfg"
-	user    = ""
-	pass    = ""
+	user    = "rdrk0006"
+	pass    = "ji848857"
 )
 
 func init() {
@@ -325,5 +325,53 @@ func TestChoiceCtr(t *testing.T) {
 		for _, v := range result.Iter() {
 			t.Logf("%+v", v)
 		}
+	}
+}
+
+func TestWinnerList(t *testing.T) {
+	choice, err := NewChoice(
+		libDir, libName, cfgDir,
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if err = choice.Start(
+		context.TODO(), user, pass,
+		NewStartOptions().
+			// TestLatency().
+			ForceLogin().
+			LogLevel(slog.LevelDebug),
+	); err != nil {
+		t.Fatal(err)
+	}
+	defer choice.Stop()
+
+	codes := []string{
+		"AG0.SHF",
+	}
+
+	opt, err := NewCsdOptions().
+		SetOption("Rank", 21)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	result, err := Csd(
+		codes,
+		[]string{
+			"FTLONGNUM", "FTSHORTNUM", "FTVOLUME", "FTLCHANGE", "FTSCHANGE",
+			"FTVCHANGE", "FTVCOUNT", "FTLCOUNT", "FTSCOUNT", "FTREGORDERVOL",
+		},
+		NewDateArg(2025, 1, 1), NewDateArg(2025, 9, 8),
+		opt,
+	)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	for _, d := range result.Iter() {
+		t.Log(d)
 	}
 }

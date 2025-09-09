@@ -5,7 +5,7 @@ import (
 )
 
 type CSDOptions struct {
-	baseOptions[CSDOptions]
+	kwOptions[CSDOptions]
 }
 
 func (opt CSDOptions) String() string {
