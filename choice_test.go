@@ -11,8 +11,8 @@ var (
 	libDir  = "./libs"
 	libName = "EMQuantAPI"
 	cfgDir  = "./cfg"
-	user    = "rdrk0006"
-	pass    = "ji848857"
+	user    = ""
+	pass    = ""
 )
 
 func init() {
