@@ -413,6 +413,21 @@ type kwOptions[T Option] struct {
 	kwOptions map[string]any
 }
 
+func (opt *kwOptions[T]) format(buff io.Writer, skip ...string) {
+	opt.dateOptions.format(buff)
+
+	if len(opt.kwOptions) <= 0 {
+		return
+	}
+
+	for k, v := range opt.kwOptions {
+		if slices.Contains(skip, k) {
+			continue
+		}
+		fmt.Fprintf(buff, " %s:%+v", k, v)
+	}
+}
+
 func (opt *kwOptions[T]) SetOption(key string, value any) (*T, error) {
 	if opt.kwOptions == nil {
 		opt.kwOptions = make(map[string]any)

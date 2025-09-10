@@ -24,14 +24,17 @@ func (opt CTROptions) String() string {
 	defer bytebufferpool.Put(buff)
 
 	buff.WriteString("CtrOptions{")
-	opt.format(buff)
 	if opt.reportName != 0 {
 		fmt.Fprintf(buff, " ReportName:%s ", opt.reportName)
 		fmt.Fprintf(buff, "SecurityCode:%s ", opt.code)
 	} else {
 		fmt.Fprintf(buff, " SecurityCode:%s ", opt.code)
 	}
-	fmt.Fprintf(buff, "ReportType:%s}", opt.reportType)
+	fmt.Fprintf(buff, "ReportType:%s", opt.reportType)
+
+	opt.format(buff, "ReportName", "SecurityCode", "ReportType")
+
+	buff.WriteString("}")
 
 	return buff.String()
 }

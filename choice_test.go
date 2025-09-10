@@ -351,20 +351,92 @@ func TestWinnerList(t *testing.T) {
 		"AG0.SHF",
 	}
 
-	opt, err := NewCsdOptions().
-		SetOption("Rank", 21)
+	// opt, err := NewCssOptions().
+	// 	TradeDate(time.Date(2025, 9, 9, 0, 0, 0, 0, time.Local)).
+	// 	SetOption("Rank", 0)
+	// if err != nil {
+	// 	t.Fatal(err)
+	// }
+	opt := NewCssOptions().
+		TradeDate(time.Date(2025, 9, 9, 0, 0, 0, 0, time.Local))
+
+	// 	# 期货现货 持买单量进榜会员名称 持卖单量进榜会员名称 成交量进榜会员名称 成交量进榜会员合计 多单量进榜会员合计 空单量进榜会员合计
+	// data=c.css("AG0.SHF","FTNEWLMEMNAME,FTNEWSMEMNAME,FTNEWVOLMEMNAME,FTNEWVOLMEMTOTAL,FTNEWLMEMTOTAL,FTNEWSMEMTOTAL","TradeDate=2025-09-10,Rank=0")
+	// # 期货现货 持买单量 持买单量比上交易日增减 持卖单量 持卖单量比上交易日增减 成交量 成交量比上交易日增减
+	// data=c.css("AG0.SHF","FTLONGNUM,FTLONGCHG,FTSHORTNUM,FTSHORTCHG,FTVOLUUME,FTVOLUMECHG","TradeDate=2025-09-10,Rank=1")
+
+	for rank := range 20 {
+		opt, err = opt.SetOption("Rank", rank+1)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		result, err := Css(
+			codes,
+			[]string{
+				// csd
+				// "FTLONGNUM", "FTSHORTNUM", "FTVOLUME", "FTLCHANGE", "FTSCHANGE",
+				// "FTVCHANGE", "FTVCOUNT", "FTLCOUNT", "FTSCOUNT", "FTREGORDERVOL",
+				"FTLONGNUM", "FTLONGCHG", "FTSHORTNUM", "FTSHORTCHG", "FTVOLUUME", "FTVOLUMECHG",
+				// css
+				"FTNEWLMEMNAME", "FTNEWSMEMNAME", "FTNEWVOLMEMNAME",
+				"FTNEWVOLMEMTOTAL", "FTNEWLMEMTOTAL", "FTNEWSMEMTOTAL",
+			},
+			// NewDateArg(2025, 1, 1), NewDateArg(2025, 9, 8),
+			opt,
+		)
+
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		for _, d := range result.Iter() {
+			t.Log(d)
+		}
+	}
+}
+
+func TestContract(t *testing.T) {
+	choice, err := NewChoice(
+		libDir, libName, cfgDir,
+	)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	result, err := Csd(
-		codes,
-		[]string{
-			"FTLONGNUM", "FTSHORTNUM", "FTVOLUME", "FTLCHANGE", "FTSCHANGE",
-			"FTVCHANGE", "FTVCOUNT", "FTLCOUNT", "FTSCOUNT", "FTREGORDERVOL",
-		},
-		NewDateArg(2025, 1, 1), NewDateArg(2025, 9, 8),
-		opt,
+	if err = choice.Start(
+		context.TODO(), user, pass,
+		NewStartOptions().
+			// TestLatency().
+			ForceLogin().
+			LogLevel(slog.LevelDebug),
+	); err != nil {
+		t.Fatal(err)
+	}
+	defer choice.Stop()
+
+	codes := []string{
+		"AG0.SHF", "CU0.SHF", "AL0.SHF", "ZN0.SHF", "SN0.SHF", "PB0.SHF",
+		"NI0.SHF", "AO0.SHF", "AD0.SHF", "AU0.SHF", "RB0.SHF", "WR0.SHF",
+		"HC0.SHF", "SS0.SHF", "FU0.SHF", "BU0.SHF", "BR0.SHF", "OP0.SHF",
+		"RU0.SHF", "SP0.SHF",
+	}
+
+	// 	# 2025-09-10 14:27:04
+	// # undefined 交易品种 交易单位 合约乘数 报价单位 最小变动价位 标准合约上市日 合约月份说明 交易时间说明 最后交易日说明 交割日期说明 最低交易保证金 标的代码
+	// data=c.css("AG0.SHF","FTTRANSTYPE,FTTRANSUNIT,CONTRACTMUL,FTPRICEUNIT,FTMINPRICECHG,LISTDATE,FTCONTRADATEINTRO,FTTRANSDATEINSTRO,FTLTRANSDATE,FTDELIVDATEINTRO,FTFIRSTTRANSMARGIN,UNDERLYINGCODE","TRADEDATE=2025-09-10")
+
+	indicators := []string{
+		"FTTRANSTYPE", "FTTRANSUNIT", "CONTRACTMUL", "FTPRICEUNIT",
+		"FTMINPRICECHG", "LISTDATE", "FTCONTRADATEINTRO", "FTTRANSDATEINSTRO",
+		"FTLTRANSDATE", "FTDELIVDATEINTRO", "FTFIRSTTRANSMARGIN", "UNDERLYINGCODE",
+	}
+
+	opt := NewCssOptions().
+		TradeDate(time.Date(2025, 9, 9, 0, 0, 0, 0, time.Local))
+
+	result, err := Css(
+		codes, indicators, opt,
 	)
 
 	if err != nil {
