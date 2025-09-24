@@ -2,7 +2,10 @@ package choice4go
 
 import (
 	"context"
+	"encoding/csv"
+	"fmt"
 	"log/slog"
+	"os"
 	"testing"
 	"time"
 )
@@ -548,7 +551,27 @@ func TestIndexConstituent(t *testing.T) {
 		); err != nil {
 			t.Fatal(err)
 		} else {
-			for _, r := range result.Iter() {
+			csvFile, err := os.Create(fmt.Sprintf("%s.csv", idx))
+			if err != nil {
+				t.Fatal(err)
+			}
+			wr := csv.NewWriter(csvFile)
+			defer func() {
+				wr.Flush()
+				csvFile.Close()
+			}()
+
+			for idx, r := range result.Iter() {
+				if idx == 0 {
+					wr.Write(r.indicators)
+				}
+
+				values := make([]string, 0, len(r.indicators))
+				for _, v := range r.Iter() {
+					values = append(values, fmt.Sprintf("%+v", v.GetValue()))
+				}
+				wr.Write(values)
+
 				t.Log(r)
 			}
 		}
