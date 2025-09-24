@@ -447,3 +447,110 @@ func TestContract(t *testing.T) {
 		t.Log(d)
 	}
 }
+
+func TestIndex(t *testing.T) {
+	choice, err := NewChoice(
+		libDir, libName, cfgDir,
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if err = choice.Start(
+		context.TODO(), user, pass,
+		NewStartOptions().
+			// TestLatency().
+			ForceLogin().
+			LogLevel(slog.LevelDebug),
+	); err != nil {
+		t.Fatal(err)
+	}
+	defer choice.Stop()
+
+	codes := []string{
+		// 中证1000
+		"000852.SH",
+		// 沪深300
+		"000300.SH",
+		// 中证500
+		"000905.SH",
+		// 上证50
+		"000016.SH",
+	}
+
+	indicators := []string{
+		"CODE", "SHORTNAME", "NAME", "BASICPOINT", "BASICDATE", "PUBLISHDATE",
+		"DELISTDATE", "COMPONENTNUM", "FIRSTDAYOFCONSTITUENTS", "MAKERNAME",
+		"INDEXPROFILE", "CALCULATION", "METHODOLOGY", "OFFICIALSTYLE",
+		"SAMPLECHGPRIN", "INDEXTYPE", "TRACKEDBYFUNDS", "TARGETCODE",
+	}
+
+	opt := NewCssOptions().
+		TradeDate(time.Date(2025, 9, 23, 0, 0, 0, 0, time.Local))
+
+	result, err := Css(
+		codes, indicators, opt,
+	)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	for _, d := range result.Iter() {
+		t.Log(d)
+	}
+}
+
+func TestIndexConstituent(t *testing.T) {
+	choice, err := NewChoice(
+		libDir, libName, cfgDir,
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if err = choice.Start(
+		context.TODO(), user, pass,
+		NewStartOptions().
+			// TestLatency().
+			ForceLogin().
+			LogLevel(slog.LevelDebug),
+	); err != nil {
+		t.Fatal(err)
+	}
+	defer choice.Stop()
+
+	codes := []string{
+		// 中证1000
+		"000852.SH",
+		// 沪深300
+		"000300.SH",
+		// 中证500
+		"000905.SH",
+		// 上证50
+		"000016.SH",
+	}
+
+	indicators := []string{
+		"INDEXCODE", "SECUCODE", "TRADEDATE", "NAME", "CLOSE", "PCTCHANGE",
+		"WEIGHT", "CONTRIBUTEPT", "SHRMARKETVALUE", "MV", "TOTALTRADABLE",
+		"SHARETOTAL",
+	}
+	opt := NewCtrOptions().EndDate(
+		time.Date(2025, 9, 23, 0, 0, 0, 0, time.Local),
+	)
+
+	for _, idx := range codes {
+		opt.SetOption("IndexCode", idx)
+
+		if result, err := Ctr(
+			"INDEXCONSTITUENT", indicators, opt,
+		); err != nil {
+			t.Fatal(err)
+		} else {
+			for _, r := range result.Iter() {
+				t.Log(r)
+			}
+		}
+	}
+}

@@ -1069,12 +1069,28 @@ func (ins *Choice) Ctr(
 		)
 	}
 
-	if options == nil ||
-		len(options.GetOptions("SecuCode", "ReportDate")) != 2 {
+	if options == nil {
 		return nil, fmt.Errorf(
-			"%w: SecuCode & ReportDate options is necessary for ctr",
-			ErrInvalidArgs,
+			"%w: option is nil", ErrInvalidArgs,
 		)
+	}
+
+	switch name {
+	case "BalanceStatementSHSZ", "IncomeStatementSHSZ",
+		"CashFlowStatementSHSZ", "InstPredictionInfo":
+		if len(options.GetOptions("SecuCode", "ReportDate")) != 2 {
+			return nil, fmt.Errorf(
+				"%w: SecuCode or ReportDate missing for CTR[%s]",
+				ErrInvalidArgs, name,
+			)
+		}
+	case "INDEXCONSTITUENT":
+		if len(options.GetOptions("IndexCode", "EndDate")) != 2 {
+			return nil, fmt.Errorf(
+				"%w: IndexCode or EndDate missing for CTR[%s]",
+				ErrInvalidArgs, name,
+			)
+		}
 	}
 
 	slog.Debug(

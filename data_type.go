@@ -135,6 +135,8 @@ func (n ReportName) Name() string {
 		return "CashFlowStatementSHSZ"
 	case RptNamePrediction:
 		return "InstPredictionInfo"
+	case RptNameIdxConstituent:
+		return "INDEXCONSTITUENT"
 	default:
 		return n.String()
 	}
@@ -150,6 +152,8 @@ func (n *ReportName) UnmarshalText(txt []byte) error {
 		*n = RptNameCashFlow
 	case "predict", "prediction", "InstPredictionInfo":
 		*n = RptNamePrediction
+	case "index", "indexconstituent", "IndexConstituent":
+		*n = RptNameIdxConstituent
 	default:
 		return fmt.Errorf(
 			"%w: unsupported value %s", ErrInvalidReportName, txt,
@@ -160,11 +164,12 @@ func (n *ReportName) UnmarshalText(txt []byte) error {
 }
 
 const (
-	RptNameInvalid    ReportName = iota // 未知报表名
-	RptNameBalance                      // 资产负债表
-	RptNameIncome                       // 利润表
-	RptNameCashFlow                     // 现金流表
-	RptNamePrediction                   // 盈利预测
+	RptNameInvalid        ReportName = iota // 未知报表名
+	RptNameBalance                          // 资产负债表
+	RptNameIncome                           // 利润表
+	RptNameCashFlow                         // 现金流表
+	RptNamePrediction                       // 盈利预测
+	RptNameIdxConstituent                   // 指数成分表
 )
 
 //go:generate stringer -type ReportType -linecomment
