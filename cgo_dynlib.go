@@ -1055,42 +1055,62 @@ func (ins *Choice) Sector(
 	return ins.callPData(fn, cArgList[0], cArgList[1], cOptions)
 }
 
+type Verifier = func(string, Option) error
+
+func DefaultCtrVerifier(rptName string, opt Option) error {
+	if rptName == "" {
+		return fmt.Errorf(
+			"%w: report name is empty", ErrInvalidArgs,
+		)
+	}
+
+	if opt == nil {
+		return fmt.Errorf(
+			"%w: option is nil", ErrInvalidArgs,
+		)
+	}
+
+	switch rptName {
+	case "BalanceStatementSHSZ", "IncomeStatementSHSZ",
+		"CashFlowStatementSHSZ", "InstPredictionInfo":
+		if len(opt.GetOptions("SecuCode", "ReportDate")) != 2 {
+			return fmt.Errorf(
+				"%w: SecuCode or ReportDate missing for CTR[%s]",
+				ErrInvalidArgs, rptName,
+			)
+		}
+	case "INDEXCONSTITUENT":
+		if len(opt.GetOptions("IndexCode", "EndDate")) != 2 {
+			return fmt.Errorf(
+				"%w: IndexCode or EndDate missing for CTR[%s]",
+				ErrInvalidArgs, rptName,
+			)
+		}
+	}
+
+	return nil
+}
+
 func (ins *Choice) Ctr(
-	name StrArg, indicators SliceArg, options Option,
+	name StrArg, indicators SliceArg, options Option, verifiers ...Verifier,
 ) (*EQCtrData, error) {
 	fn, err := ins.checkLibFn("ctr")
 	if err != nil {
 		return nil, err
 	}
 
-	if name.IsEmpty() || indicators.IsEmpty() {
-		return nil, fmt.Errorf(
-			"%w: name or indicators is empty", ErrInvalidArgs,
-		)
+	verifiers = append([]Verifier{DefaultCtrVerifier}, verifiers...)
+
+	for _, check := range verifiers {
+		if err := check(name.String(), options); err != nil {
+			return nil, err
+		}
 	}
 
-	if options == nil {
+	if indicators.IsEmpty() {
 		return nil, fmt.Errorf(
-			"%w: option is nil", ErrInvalidArgs,
+			"%w: indicators is empty", ErrInvalidArgs,
 		)
-	}
-
-	switch name {
-	case "BalanceStatementSHSZ", "IncomeStatementSHSZ",
-		"CashFlowStatementSHSZ", "InstPredictionInfo":
-		if len(options.GetOptions("SecuCode", "ReportDate")) != 2 {
-			return nil, fmt.Errorf(
-				"%w: SecuCode or ReportDate missing for CTR[%s]",
-				ErrInvalidArgs, name,
-			)
-		}
-	case "INDEXCONSTITUENT":
-		if len(options.GetOptions("IndexCode", "EndDate")) != 2 {
-			return nil, fmt.Errorf(
-				"%w: IndexCode or EndDate missing for CTR[%s]",
-				ErrInvalidArgs, name,
-			)
-		}
 	}
 
 	slog.Debug(
