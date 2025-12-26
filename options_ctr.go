@@ -24,7 +24,7 @@ func (opt CTROptions) String() string {
 	defer bytebufferpool.Put(buff)
 
 	buff.WriteString("CtrOptions{")
-	if opt.reportName != 0 {
+	if opt.reportName.reportName != RptNameInvalid {
 		fmt.Fprintf(buff, " ReportName:%s ", opt.reportName)
 		fmt.Fprintf(buff, "SecurityCode:%s ", opt.code)
 	} else {
@@ -166,7 +166,7 @@ func (opt *CTROptions) SetOption(key string, value any) (*CTROptions, error) {
 func GetReportName(opt Option) ReportName {
 	ctr, ok := opt.(*CTROptions)
 	if !ok {
-		return 0
+		return ReportName{}
 	}
 
 	return ctr.reportName

@@ -2,6 +2,7 @@ package choice4go
 
 import (
 	"fmt"
+	"log/slog"
 	"slices"
 	"strconv"
 	"strings"
@@ -122,27 +123,10 @@ const (
 	FuncCSES                 // CSEC
 )
 
-//go:generate stringer -type ReportName -linecomment
-type ReportName uint8
+//go:generate stringer -type reportName -linecomment
+type reportName uint8
 
-func (n ReportName) Name() string {
-	switch n {
-	case RptNameBalance:
-		return "BalanceStatementSHSZ"
-	case RptNameIncome:
-		return "IncomeStatementSHSZ"
-	case RptNameCashFlow:
-		return "CashFlowStatementSHSZ"
-	case RptNamePrediction:
-		return "InstPredictionInfo"
-	case RptNameIdxConstituent:
-		return "INDEXCONSTITUENT"
-	default:
-		return n.String()
-	}
-}
-
-func (n *ReportName) UnmarshalText(txt []byte) error {
+func (n *reportName) UnmarshalText(txt []byte) error {
 	switch strings.ToLower(string(txt)) {
 	case "balance", "BalanceStatementSHSZ":
 		*n = RptNameBalance
@@ -163,14 +147,65 @@ func (n *ReportName) UnmarshalText(txt []byte) error {
 	return nil
 }
 
+func (n reportName) Name() string {
+	switch n {
+	case RptNameBalance:
+		return "BalanceStatementSHSZ"
+	case RptNameIncome:
+		return "IncomeStatementSHSZ"
+	case RptNameCashFlow:
+		return "CashFlowStatementSHSZ"
+	case RptNamePrediction:
+		return "InstPredictionInfo"
+	case RptNameIdxConstituent:
+		return "INDEXCONSTITUENT"
+	default:
+		return n.String()
+	}
+}
+
 const (
-	RptNameInvalid        ReportName = iota // 未知报表名
+	RptNameInvalid        reportName = iota // 未知报表名
 	RptNameBalance                          // 资产负债表
 	RptNameIncome                           // 利润表
 	RptNameCashFlow                         // 现金流表
 	RptNamePrediction                       // 盈利预测
 	RptNameIdxConstituent                   // 指数成分表
 )
+
+type ReportName struct {
+	reportName
+
+	value string
+}
+
+func (n ReportName) Name() string {
+	if n.reportName != RptNameInvalid {
+		return n.reportName.Name()
+	}
+
+	return n.value
+}
+
+func (n ReportName) String() string {
+	if n.reportName != RptNameInvalid {
+		return n.reportName.String()
+	}
+
+	return n.value
+}
+
+func (n *ReportName) UnmarshalText(v []byte) error {
+	if err := n.reportName.UnmarshalText(v); err != nil {
+		slog.Warn(
+			"not a wellknown report name",
+			slog.String("name", string(v)),
+		)
+	} else {
+		n.value = string(v)
+	}
+	return nil
+}
 
 //go:generate stringer -type ReportType -linecomment
 type ReportType uint8
