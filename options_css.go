@@ -24,7 +24,3 @@ func NewCssOptions() *CSSOptions {
 
 	return opt.initBase(opt)
 }
-
-func init() {
-	var _ KwOption[CSSOptions] = &CSSOptions{}
-}

@@ -11,15 +11,30 @@ import (
 	"github.com/valyala/bytebufferpool"
 )
 
-type CTROptions struct {
-	kwOptions[CTROptions]
+type CTROptions[T Option] struct {
+	kwOptions[T]
+}
+
+func (opt CTROptions[T]) String() string {
+	buff := bytebufferpool.Get()
+	defer bytebufferpool.Put(buff)
+
+	buff.WriteString("CtrOptions{")
+	opt.format(buff)
+	buff.WriteString("}")
+
+	return buff.String()
+}
+
+type CTRFinacialOptions struct {
+	CTROptions[CTRFinacialOptions]
 
 	code       string
 	reportType ReportType
 	reportName ReportName
 }
 
-func (opt CTROptions) String() string {
+func (opt CTRFinacialOptions) String() string {
 	buff := bytebufferpool.Get()
 	defer bytebufferpool.Put(buff)
 
@@ -39,7 +54,7 @@ func (opt CTROptions) String() string {
 	return buff.String()
 }
 
-func (opt *CTROptions) Code(v string) *CTROptions {
+func (opt *CTRFinacialOptions) Code(v string) *CTRFinacialOptions {
 	if v != "" {
 		codeStr := fmt.Sprintf("SecuCode=%s", v)
 		if optIdx := opt.findOptIdx("SecuCode"); optIdx < 0 {
@@ -58,7 +73,7 @@ func (opt *CTROptions) Code(v string) *CTROptions {
 	return opt
 }
 
-func (opt *CTROptions) Type(v ReportType) *CTROptions {
+func (opt *CTRFinacialOptions) Type(v ReportType) *CTRFinacialOptions {
 	typeStr := fmt.Sprintf("ReportType=%d", v)
 
 	if optIdx := opt.findOptIdx("ReportType"); optIdx < 0 {
@@ -72,7 +87,7 @@ func (opt *CTROptions) Type(v ReportType) *CTROptions {
 	return opt
 }
 
-func (opt *CTROptions) SetOption(key string, value any) (*CTROptions, error) {
+func (opt *CTRFinacialOptions) SetOption(key string, value any) (*CTRFinacialOptions, error) {
 	if value == nil {
 		slog.Warn(
 			"ctr option set an nil value",
@@ -160,7 +175,7 @@ func (opt *CTROptions) SetOption(key string, value any) (*CTROptions, error) {
 }
 
 func GetReportName(opt Option) ReportName {
-	ctr, ok := opt.(*CTROptions)
+	ctr, ok := opt.(*CTRFinacialOptions)
 	if !ok {
 		return 0
 	}
@@ -169,7 +184,7 @@ func GetReportName(opt Option) ReportName {
 }
 
 func GetReportDate(opt Option) time.Time {
-	ctr, ok := opt.(*CTROptions)
+	ctr, ok := opt.(*CTRFinacialOptions)
 	if !ok {
 		return time.Time{}
 	}
@@ -178,7 +193,7 @@ func GetReportDate(opt Option) time.Time {
 }
 
 func GetReportType(opt Option) ReportType {
-	ctr, ok := opt.(*CTROptions)
+	ctr, ok := opt.(*CTRFinacialOptions)
 	if !ok {
 		return RptTypeCombined
 	}
@@ -186,12 +201,8 @@ func GetReportType(opt Option) ReportType {
 	return ctr.reportType
 }
 
-func NewCtrOptions() *CTROptions {
-	opt := new(CTROptions)
+func NewCtrFinacialOptions() *CTRFinacialOptions {
+	opt := new(CTRFinacialOptions)
 
 	return opt.initBase(opt.Type(RptTypeCombined))
-}
-
-func init() {
-	var _ KwOption[CTROptions] = &CTROptions{}
 }

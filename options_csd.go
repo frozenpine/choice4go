@@ -24,7 +24,3 @@ func NewCsdOptions() *CSDOptions {
 
 	return opt.initBase(opt)
 }
-
-func init() {
-	var _ Option = &CSDOptions{}
-}

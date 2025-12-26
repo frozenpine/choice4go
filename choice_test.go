@@ -315,7 +315,7 @@ func TestChoiceCtr(t *testing.T) {
 			"REPORTSOURCETYPE", "STR_COMBINETYPE",
 			"OPINIONTYPE", "FIRSTNOTICEDATE",
 		},
-		NewCtrOptions().
+		NewCtrFinacialOptions().
 			ReportDate(time.Date(2024, 12, 31, 0, 0, 0, 0, time.Local)).
 			// Range(
 			// 	time.Date(2024, 1, 1, 0, 0, 0, 0, time.Local),
@@ -539,8 +539,8 @@ func TestIndexConstituent(t *testing.T) {
 		"WEIGHT", "CONTRIBUTEPT", "SHRMARKETVALUE", "MV", "TOTALTRADABLE",
 		"SHARETOTAL",
 	}
-	opt := NewCtrOptions().EndDate(
-		time.Date(2025, 9, 23, 0, 0, 0, 0, time.Local),
+	opt := NewCtrFinacialOptions().EndDate(
+		time.Date(2025, 12, 23, 0, 0, 0, 0, time.Local),
 	)
 
 	for _, idx := range codes {
