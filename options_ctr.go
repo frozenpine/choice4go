@@ -171,7 +171,11 @@ func (opt *CTRFinacialOptions) SetOption(key string, value any) (*CTRFinacialOpt
 		}
 	}
 
-	return opt.kwOptions.SetOption(key, value)
+	if _, err := opt.kwOptions.SetOption(key, value); err != nil {
+		return nil, err
+	}
+
+	return opt, nil
 }
 
 func GetReportName(opt Option) ReportName {
@@ -204,5 +208,15 @@ func GetReportType(opt Option) ReportType {
 func NewCtrFinacialOptions() *CTRFinacialOptions {
 	opt := new(CTRFinacialOptions)
 
-	return opt.initBase(opt.Type(RptTypeCombined))
+	opt.initBase(opt.Type(RptTypeCombined))
+
+	return opt
+}
+
+func NewCtrOptions[T Option]() *CTROptions[T] {
+	opt := new(CTROptions[T])
+
+	opt.initBase(opt.specificOpt)
+
+	return opt
 }
