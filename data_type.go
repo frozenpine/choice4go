@@ -385,3 +385,12 @@ func (b Boolean) Name() string {
 func (b Boolean) Value() bool {
 	return bool(b)
 }
+
+//go:generate stringer -type ttmType -linecomment
+type ttmType uint8
+
+const (
+	_                 ttmType = iota
+	TTMRptEndDate             // 报表截止期
+	TTMRptAnounceDate         // 报表公告期
+)

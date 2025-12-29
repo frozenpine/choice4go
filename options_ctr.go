@@ -39,6 +39,7 @@ func (opt CTROptions) String() string {
 	return buff.String()
 }
 
+// Code 设置报表标的代码
 func (opt *CTROptions) Code(v string) *CTROptions {
 	if v != "" {
 		codeStr := fmt.Sprintf("SecuCode=%s", v)
@@ -58,6 +59,9 @@ func (opt *CTROptions) Code(v string) *CTROptions {
 	return opt
 }
 
+func (opt *CTROptions) GetCode() string { return opt.code }
+
+// Type 设置报表类型
 func (opt *CTROptions) Type(v ReportType) *CTROptions {
 	typeStr := fmt.Sprintf("ReportType=%d", v)
 
@@ -71,6 +75,8 @@ func (opt *CTROptions) Type(v ReportType) *CTROptions {
 
 	return opt
 }
+
+func (opt *CTROptions) GetType() ReportType { return opt.reportType }
 
 func (opt *CTROptions) SetOption(key string, value any) (*CTROptions, error) {
 	if value == nil {

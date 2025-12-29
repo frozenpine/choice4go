@@ -148,6 +148,7 @@ func (opt *baseOptions[T]) format(wr io.Writer) {
 	}
 }
 
+// Period 设置数据频次
 func (opt *baseOptions[T]) Period(p period) *T {
 	periodOpt := fmt.Sprintf("Period=%d", p)
 
@@ -162,6 +163,9 @@ func (opt *baseOptions[T]) Period(p period) *T {
 	return opt.specificOpt
 }
 
+func (opt *baseOptions[T]) GetPeriod() period { return opt.period }
+
+// Adjust 设置复权方式
 func (opt *baseOptions[T]) Adjust(flag adjustFlag) *T {
 	flagOpt := fmt.Sprintf("AdjustFlag=%d", flag)
 
@@ -175,6 +179,9 @@ func (opt *baseOptions[T]) Adjust(flag adjustFlag) *T {
 	return opt.specificOpt
 }
 
+func (opt *baseOptions[T]) GetAdjustFlag() adjustFlag { return opt.adjustFlag }
+
+// Currency 设置币种
 func (opt *baseOptions[T]) Currency(curr currency) *T {
 	currOpt := fmt.Sprintf("CurType=%d", curr)
 
@@ -188,6 +195,9 @@ func (opt *baseOptions[T]) Currency(curr currency) *T {
 	return opt.specificOpt
 }
 
+func (opt *baseOptions[T]) GetCurrency() currency { return opt.currType }
+
+// BondType 设置债券价格模式
 func (opt *baseOptions[T]) BondType(bond bondType) *T {
 	bondOpt := fmt.Sprintf("Type=%d", bond)
 
@@ -201,6 +211,9 @@ func (opt *baseOptions[T]) BondType(bond bondType) *T {
 	return opt.specificOpt
 }
 
+func (opt *baseOptions[T]) GetBondType() bondType { return opt.bondType }
+
+// DateASC 设置日期升序
 func (opt *baseOptions[T]) DateASC() *T {
 	if optIdx := opt.findOptIdx("Order"); optIdx < 0 {
 		opt.options = append(opt.options, "Order=1")
@@ -212,6 +225,7 @@ func (opt *baseOptions[T]) DateASC() *T {
 	return opt.specificOpt
 }
 
+// DateDESC 设置日期降序
 func (opt *baseOptions[T]) DateDESC() *T {
 	if optIdx := opt.findOptIdx("Order"); optIdx < 0 {
 		opt.options = append(opt.options, "Order=2")
@@ -223,6 +237,9 @@ func (opt *baseOptions[T]) DateDESC() *T {
 	return opt.specificOpt
 }
 
+func (opt *baseOptions[T]) IsDESC() bool { return opt.dateDESC }
+
+// FillData 设置数据填充
 func (opt *baseOptions[T]) FillData() *T {
 	if optIdx := opt.findOptIdx("filldata"); optIdx < 0 {
 		opt.options = append(opt.options, "filldata=1")
@@ -234,6 +251,8 @@ func (opt *baseOptions[T]) FillData() *T {
 
 	return opt.specificOpt
 }
+
+func (opt *baseOptions[T]) IsFill() bool { return opt.fillFlag }
 
 type DateOption[T Option] interface {
 	BaseOption[T]
@@ -362,6 +381,9 @@ func (opt *dateOptions[T]) ReportDate(v time.Time) *T {
 	return opt.specificOpt
 }
 
+func (opt *dateOptions[T]) GetReportDate() time.Time { return opt.reportDate }
+
+// TradeDate 设置交易日期
 func (opt *dateOptions[T]) TradeDate(v time.Time) *T {
 	optStr := fmt.Sprintf("TradeDate=%s", v.Format("2006-01-02"))
 
@@ -375,6 +397,9 @@ func (opt *dateOptions[T]) TradeDate(v time.Time) *T {
 	return opt.specificOpt
 }
 
+func (opt *dateOptions[T]) GetTradeDate() time.Time { return opt.tradeDate }
+
+// StartDate 设置起始日期
 func (opt *dateOptions[T]) StartDate(start time.Time) *T {
 	startStr := fmt.Sprintf("StartDate=%s", start.Format("2006-01-02"))
 
@@ -388,6 +413,9 @@ func (opt *dateOptions[T]) StartDate(start time.Time) *T {
 	return opt.specificOpt
 }
 
+func (opt *dateOptions[T]) GetStartDate() time.Time { return opt.startDate }
+
+// EndDate 设置截止日期
 func (opt *dateOptions[T]) EndDate(end time.Time) *T {
 	endStr := fmt.Sprintf("EndDate=%s", end.Format("2006-01-02"))
 
@@ -400,6 +428,8 @@ func (opt *dateOptions[T]) EndDate(end time.Time) *T {
 	opt.endDate = end
 	return opt.specificOpt
 }
+
+func (opt *dateOptions[T]) GetEndDate() time.Time { return opt.endDate }
 
 type KwOption[T Option] interface {
 	DateOption[T]
