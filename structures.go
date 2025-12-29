@@ -134,6 +134,27 @@ type Indicator struct {
 	Date       time.Time
 	indicators []string
 	value      []*EQValue
+
+	extended map[string]*EQValue
+}
+
+func (v *Indicator) Extend(name string, value *EQValue) {
+	if name == "" || value == nil {
+		return
+	}
+
+	if v.extended == nil {
+		v.extended = make(map[string]*EQValue)
+	}
+	v.extended[name] = value
+}
+
+func (v Indicator) GetExtend(name string) *EQValue {
+	if v.extended == nil {
+		return nil
+	}
+
+	return v.extended[name]
 }
 
 func (v Indicator) String() string {
@@ -278,6 +299,27 @@ func (data *EQData) Iter() func(yield func(int, *Indicator) bool) {
 type Report struct {
 	indicators []string
 	value      []*EQValue
+
+	extended map[string]*EQValue
+}
+
+func (rpt *Report) Extend(name string, value *EQValue) {
+	if name == "" || value == nil {
+		return
+	}
+
+	if rpt.extended == nil {
+		rpt.extended = make(map[string]*EQValue)
+	}
+	rpt.extended[name] = value
+}
+
+func (rpt Report) GetExtend(name string) *EQValue {
+	if rpt.extended == nil {
+		return nil
+	}
+
+	return rpt.extended[name]
 }
 
 func (rpt Report) String() string {
