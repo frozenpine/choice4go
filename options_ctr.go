@@ -6,7 +6,6 @@ import (
 	"log/slog"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/valyala/bytebufferpool"
 )
@@ -77,6 +76,11 @@ func (opt *CTROptions) Type(v ReportType) *CTROptions {
 }
 
 func (opt *CTROptions) GetType() ReportType { return opt.reportType }
+
+func (opt *CTROptions) Name(v reportName) {
+	opt.reportName.reportName = v
+	opt.reportName.value = v.String()
+}
 
 func (opt *CTROptions) SetOption(key string, value any) (*CTROptions, error) {
 	if value == nil {
@@ -169,32 +173,32 @@ func (opt *CTROptions) SetOption(key string, value any) (*CTROptions, error) {
 	return opt, nil
 }
 
-func GetReportName(opt Option) ReportName {
-	ctr, ok := opt.(*CTROptions)
-	if !ok {
-		return ReportName{}
-	}
+// func GetReportName(opt Option) ReportName {
+// 	ctr, ok := opt.(*CTROptions)
+// 	if !ok {
+// 		return ReportName{}
+// 	}
 
-	return ctr.reportName
-}
+// 	return ctr.reportName
+// }
 
-func GetReportDate(opt Option) time.Time {
-	ctr, ok := opt.(*CTROptions)
-	if !ok {
-		return time.Time{}
-	}
+// func GetReportDate(opt Option) time.Time {
+// 	ctr, ok := opt.(*CTROptions)
+// 	if !ok {
+// 		return time.Time{}
+// 	}
 
-	return ctr.reportDate
-}
+// 	return ctr.reportDate
+// }
 
-func GetReportType(opt Option) ReportType {
-	ctr, ok := opt.(*CTROptions)
-	if !ok {
-		return RptTypeCombined
-	}
+// func GetReportType(opt Option) ReportType {
+// 	ctr, ok := opt.(*CTROptions)
+// 	if !ok {
+// 		return RptTypeCombined
+// 	}
 
-	return ctr.reportType
-}
+// 	return ctr.reportType
+// }
 
 func NewCtrOptions() *CTROptions {
 	opt := new(CTROptions)
