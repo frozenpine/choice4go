@@ -43,36 +43,85 @@ func (v *EQValue) GetChar() uint8 {
 	return v.valueBuffer[0]
 }
 
+func (v *EQValue) Char(c uint8) {
+	v.valueType = ValueChar
+	v.valueBuffer[0] = c
+}
+
 func (v *EQValue) GetByte() byte {
 	return v.valueBuffer[0]
+}
+
+func (v *EQValue) Byte(c byte) {
+	v.valueType = ValueByte
+	v.valueBuffer[0] = c
 }
 
 func (v *EQValue) GetBool() bool {
 	return binary.LittleEndian.Uint32(v.valueBuffer[:]) > 0
 }
 
+func (v *EQValue) Bool(b bool) {
+	v.valueType = ValueBool
+	if b {
+		binary.LittleEndian.PutUint32(v.valueBuffer[:], 1)
+	} else {
+		binary.LittleEndian.PutUint32(v.valueBuffer[:], 0)
+	}
+}
+
 func (v *EQValue) GetShort() int16 {
 	return int16(binary.LittleEndian.Uint16(v.valueBuffer[:]))
+}
+
+func (v *EQValue) Short(s int16) {
+	v.valueType = ValueShort
+	binary.LittleEndian.PutUint16(v.valueBuffer[:], uint16(s))
 }
 
 func (v *EQValue) GetUShort() uint16 {
 	return binary.LittleEndian.Uint16(v.valueBuffer[:])
 }
 
+func (v *EQValue) UShort(s uint16) {
+	v.valueType = ValueUShort
+	binary.LittleEndian.PutUint16(v.valueBuffer[:], s)
+}
+
 func (v *EQValue) GetInt() int {
 	return int(binary.LittleEndian.Uint32(v.valueBuffer[:]))
+}
+
+func (v *EQValue) Int(i int) {
+	v.valueType = ValueInt
+	binary.LittleEndian.PutUint32(v.valueBuffer[:], uint32(i))
 }
 
 func (v *EQValue) GetUInt() uint {
 	return uint(binary.LittleEndian.Uint32(v.valueBuffer[:]))
 }
 
+func (v *EQValue) UInt(u uint) {
+	v.valueType = ValueUInt
+	binary.LittleEndian.PutUint32(v.valueBuffer[:], uint32(u))
+}
+
 func (v *EQValue) GetInt64() int64 {
 	return int64(binary.LittleEndian.Uint64(v.valueBuffer[:]))
 }
 
+func (v *EQValue) Int64(i int64) {
+	v.valueType = ValueInt64
+	binary.LittleEndian.PutUint64(v.valueBuffer[:], uint64(i))
+}
+
 func (v *EQValue) GetUInt64() uint64 {
 	return binary.LittleEndian.Uint64(v.valueBuffer[:])
+}
+
+func (v *EQValue) UInt64(u uint64) {
+	v.valueType = ValueUInt64
+	binary.LittleEndian.PutUint64(v.valueBuffer[:], u)
 }
 
 func (v *EQValue) GetSingle() float32 {
@@ -81,14 +130,29 @@ func (v *EQValue) GetSingle() float32 {
 	)
 }
 
+func (v *EQValue) Single(s float32) {
+	v.valueType = ValueSingle
+	binary.LittleEndian.PutUint32(v.valueBuffer[:], math.Float32bits(s))
+}
+
 func (v *EQValue) GetDouble() float64 {
 	return math.Float64frombits(
 		binary.LittleEndian.Uint64(v.valueBuffer[:]),
 	)
 }
 
+func (v *EQValue) Double(d float64) {
+	v.valueType = ValueDouble
+	binary.LittleEndian.PutUint64(v.valueBuffer[:], math.Float64bits(d))
+}
+
 func (v *EQValue) GetBytes() []byte {
 	return v.valueBuffer[:]
+}
+
+func (v *EQValue) Bytes(d []byte) {
+	v.valueType = ValueBytes
+	copy(v.valueBuffer[:], d)
 }
 
 func (v *EQValue) GetValue() any {
