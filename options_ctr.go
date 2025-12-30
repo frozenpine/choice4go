@@ -58,7 +58,7 @@ func (opt *CTROptions) Code(v string) *CTROptions {
 	return opt
 }
 
-func (opt *CTROptions) GetCode() string { return opt.code }
+func (opt CTROptions) GetCode() string { return opt.code }
 
 // Type 设置报表类型
 func (opt *CTROptions) Type(v ReportType) *CTROptions {
@@ -75,14 +75,14 @@ func (opt *CTROptions) Type(v ReportType) *CTROptions {
 	return opt
 }
 
-func (opt *CTROptions) GetType() ReportType { return opt.reportType }
+func (opt CTROptions) GetType() ReportType { return opt.reportType }
 
 func (opt *CTROptions) Name(v reportName) {
 	opt.reportName.reportName = v
 	opt.reportName.value = v.String()
 }
 
-func (opt *CTROptions) GetName() ReportName { return opt.reportName }
+func (opt CTROptions) GetName() ReportName { return opt.reportName }
 
 func (opt *CTROptions) SetOption(key string, value any) (*CTROptions, error) {
 	if value == nil {
@@ -93,7 +93,7 @@ func (opt *CTROptions) SetOption(key string, value any) (*CTROptions, error) {
 		return opt, nil
 	}
 
-	switch strings.ToLower(key) {
+	switch strings.ToLower(strings.TrimSpace(key)) {
 	case "reporttype", "report_type":
 		switch v := value.(type) {
 		case int:
@@ -136,7 +136,7 @@ func (opt *CTROptions) SetOption(key string, value any) (*CTROptions, error) {
 			)
 			return opt, ErrInvalidOptionValue
 		}
-	case "secucode", "secu_code", "symbol":
+	case "secucode", "secu_code", "symbol", "security":
 		if v, ok := value.(string); !ok {
 			slog.Error(
 				"ctr set option unsupported SecuCode value",
@@ -147,7 +147,7 @@ func (opt *CTROptions) SetOption(key string, value any) (*CTROptions, error) {
 		} else {
 			return opt.Code(v), nil
 		}
-	case "reportname", "report_name":
+	case "name", "reportname", "report_name":
 		if v, ok := value.(string); !ok {
 			slog.Error(
 				"ctr set option unsupported SecuCode value",
@@ -168,11 +168,7 @@ func (opt *CTROptions) SetOption(key string, value any) (*CTROptions, error) {
 		}
 	}
 
-	if _, err := opt.kwOptions.SetOption(key, value); err != nil {
-		return nil, err
-	}
-
-	return opt, nil
+	return opt.kwOptions.SetOption(key, value)
 }
 
 // func GetReportName(opt Option) ReportName {
