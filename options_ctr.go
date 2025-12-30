@@ -82,6 +82,8 @@ func (opt *CTROptions) Name(v reportName) {
 	opt.reportName.value = v.String()
 }
 
+func (opt *CTROptions) GetName() ReportName { return opt.reportName }
+
 func (opt *CTROptions) SetOption(key string, value any) (*CTROptions, error) {
 	if value == nil {
 		slog.Warn(
