@@ -201,7 +201,5 @@ func (opt *CTROptions) SetOption(key string, value any) (*CTROptions, error) {
 func NewCtrOptions() *CTROptions {
 	opt := new(CTROptions)
 
-	opt.initBase(opt.Type(RptTypeCombined))
-
-	return opt
+	return opt.initBase(opt).Type(RptTypeCombined)
 }

@@ -287,13 +287,13 @@ func (opt *dateOptions[T]) format(wr io.Writer) {
 		fmt.Fprintf(wr, "TradeDate:%+v ", opt.tradeDate)
 	}
 
-	if opt.tradeDate.IsZero() {
+	if opt.startDate.IsZero() {
 		fmt.Fprint(wr, "StartDate:'not specified' ")
 	} else {
 		fmt.Fprintf(wr, "StartDate:%+v ", opt.startDate)
 	}
 
-	if opt.tradeDate.IsZero() {
+	if opt.endDate.IsZero() {
 		fmt.Fprint(wr, "EndDate:'not specified'")
 	} else {
 		fmt.Fprintf(wr, "EndDate:%+v", opt.endDate)
