@@ -188,21 +188,21 @@ func TestChoiceCss(t *testing.T) {
 	defer choice.Stop()
 
 	rptDate := time.Date(2025, 9, 30, 0, 0, 0, 0, time.Local)
-	tradeDate := time.Date(2025, 12, 25, 0, 0, 0, 0, time.Local)
-	endDate := time.Date(2025, 12, 25, 0, 0, 0, 0, time.Local)
+	// tradeDate := time.Date(2025, 12, 25, 0, 0, 0, 0, time.Local)
+	// endDate := time.Date(2025, 12, 25, 0, 0, 0, 0, time.Local)
 
 	cssOpt := NewCssOptions().
-		ReportDate(rptDate).
-		EndDate(endDate).
-		TradeDate(tradeDate)
-	cssOpt, err = cssOpt.SetOption("TtmType", 2)
-	if err != nil {
-		t.Fatal(err)
-	}
-	cssOpt, err = cssOpt.SetOption("DataAdjustType", 1)
-	if err != nil {
-		t.Fatal(err)
-	}
+		ReportDate(rptDate)
+		// EndDate(endDate).
+		// TradeDate(tradeDate)
+	// cssOpt, err = cssOpt.SetOption("TtmType", 2)
+	// if err != nil {
+	// 	t.Fatal(err)
+	// }
+	// cssOpt, err = cssOpt.SetOption("DataAdjustType", 1)
+	// if err != nil {
+	// 	t.Fatal(err)
+	// }
 
 	symbols := []string{
 		"002961.SZ", "600519.SH",
@@ -220,23 +220,21 @@ func TestChoiceCss(t *testing.T) {
 			// "UNDISTRIBUTEDPS", "UNDISTRIBUTEDPSN", "RETAINEDPS", "CFPS",
 			// "CFPSTTM", "CFPSDILUTEDNEW", "EBITPS", "FCFFPS", "FCFEPS", "EBITDAPS",
 			// 盈利能力
-			// "ROEAVG", "ROEWA", "ROEDILUTED", "ROEEXAVG", "ROEEXWA",
-			// "ROEEXDILUTED", "ROEZFPLZ", "ROEAVGADD", "DEDUCTFALOWROEWA",
-			// "NROA", "ROA", "ROIC", "ANNUROE", "ANNUROA", "ANNUNROA", "ROETTM",
-			// "ROETAVG", "ROETTMRPT", "ROETTMDEDUCTED", "ROATTM",
+			"ROEAVG", "ROEWA", "ROEDILUTED", "ROEEXAVG", "ROEEXWA", "ROEEXDILUTED",
+			"ROEAVGADD", "ROA", "NROA", "ROIC", "ANNUROE", "ANNUROA", "ANNUNROA",
 			// 偿债能力
-			"CURRENTTATIO", "CASHTATIO", "CASHTATIO2", "QUICKTATIO",
-			"CONSERVQUICKRATIO", "LIBILITYTOEQUITY", "OCFTOQUICKDEBT",
-			"EQUITYTOLIBILITY", "EQUITYTOINTERESTLIBILITY",
-			"TANGIBLEASSETTOLIBILITY", "TANGIBLEASSETTOINTERESTLIBILITY",
-			"TANGIBLEASSETTONETLIBILITY", "EBITDATOLIBILITY", "CFOTOLIBILITY",
-			"CFOTOINTERESTLIBILITY", "CFOTOSHORTLIBILITY", "CFOTONETLIBILITY",
-			"EBITTOINTEREST", "LONGLIBILITYTOWORKINGCAPITAL", "NETLIBILITYTOEV",
-			"INTERESTLIBILITYTOEV", "EBITDATOINTERESTCOST",
-			"EBITDATOINTERESTDEBT", "OCFTOINTEREST", "CASHTOSTDEBT",
-			"TLTOEBITDA", "OICFTODEBT", "OICFTOCL", "LONGDEBTTODEBT",
-			"DEBTTOEQY", "CFOTOUNFLOWDEBT", "CASHTOSHORTDEBT", "NETDEBTRATIO",
-			"DEBTTOTANGIBLEEQUITY", "NETLIBILITYTOEVLYR",
+			// "CURRENTTATIO", "CASHTATIO", "CASHTATIO2", "QUICKTATIO",
+			// "CONSERVQUICKRATIO", "LIBILITYTOEQUITY", "OCFTOQUICKDEBT",
+			// "EQUITYTOLIBILITY", "EQUITYTOINTERESTLIBILITY",
+			// "TANGIBLEASSETTOLIBILITY", "TANGIBLEASSETTOINTERESTLIBILITY",
+			// "TANGIBLEASSETTONETLIBILITY", "EBITDATOLIBILITY", "CFOTOLIBILITY",
+			// "CFOTOINTERESTLIBILITY", "CFOTOSHORTLIBILITY", "CFOTONETLIBILITY",
+			// "EBITTOINTEREST", "LONGLIBILITYTOWORKINGCAPITAL", "NETLIBILITYTOEV",
+			// "INTERESTLIBILITYTOEV", "EBITDATOINTERESTCOST",
+			// "EBITDATOINTERESTDEBT", "OCFTOINTEREST", "CASHTOSTDEBT",
+			// "TLTOEBITDA", "OICFTODEBT", "OICFTOCL", "LONGDEBTTODEBT",
+			// "DEBTTOEQY", "CFOTOUNFLOWDEBT", "CASHTOSHORTDEBT", "NETDEBTRATIO",
+			// "DEBTTOTANGIBLEEQUITY", "NETLIBILITYTOEVLYR",
 			// 投资评级
 			// "RATINGAVG", "RATINGAVGCHN", "RATINGAVGENG", "RATINGINSTNUM",
 			// "RATINGMAINTAIN", "RATINGUPGRADE", "RATINGDOWNGRADE",
@@ -385,7 +383,7 @@ func TestWinnerList(t *testing.T) {
 	defer choice.Stop()
 
 	codes := []string{
-		"AG0.SHF",
+		"SCM.INE",
 	}
 
 	// opt, err := NewCssOptions().
@@ -404,6 +402,7 @@ func TestWinnerList(t *testing.T) {
 
 	for rank := range 20 {
 		opt, err = opt.SetOption("Rank", rank+1)
+		// opt, err = opt.SetOption("Rank", 0)
 		if err != nil {
 			t.Fatal(err)
 		}
