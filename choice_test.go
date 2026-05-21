@@ -383,7 +383,7 @@ func TestWinnerList(t *testing.T) {
 	defer choice.Stop()
 
 	codes := []string{
-		"SCM.INE",
+		"AG0.SHF",
 	}
 
 	// opt, err := NewCssOptions().
@@ -393,7 +393,7 @@ func TestWinnerList(t *testing.T) {
 	// 	t.Fatal(err)
 	// }
 	opt := NewCssOptions().
-		TradeDate(time.Date(2025, 9, 9, 0, 0, 0, 0, time.Local))
+		TradeDate(time.Date(2026, 5, 19, 0, 0, 0, 0, time.Local))
 
 	// 	# 期货现货 持买单量进榜会员名称 持卖单量进榜会员名称 成交量进榜会员名称 成交量进榜会员合计 多单量进榜会员合计 空单量进榜会员合计
 	// data=c.css("AG0.SHF","FTNEWLMEMNAME,FTNEWSMEMNAME,FTNEWVOLMEMNAME,FTNEWVOLMEMTOTAL,FTNEWLMEMTOTAL,FTNEWSMEMTOTAL","TradeDate=2025-09-10,Rank=0")
